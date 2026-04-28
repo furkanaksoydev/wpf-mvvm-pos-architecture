@@ -49,7 +49,6 @@ namespace Lavira.AkyaPOS.Repositories
             return items;
         }
 
-        // 🔴 ASIL ÖNEMLİ KISIM
         public void UpdateOrderItems(int tableId, ObservableCollection<TableOrderItem> items)
         {
             using var conn = DatabasePathHelper.GetConnection();
@@ -57,7 +56,6 @@ namespace Lavira.AkyaPOS.Repositories
 
             using var tran = conn.BeginTransaction();
 
-            // aktif sipariş id
             using var getOrderCmd = conn.CreateCommand();
             getOrderCmd.CommandText = @"
                 SELECT id FROM akya_orders
@@ -69,14 +67,12 @@ namespace Lavira.AkyaPOS.Repositories
             if (orderId == null)
                 throw new Exception("Açık sipariş bulunamadı.");
 
-            // 🔥 eski ürünleri temizle
             using var deleteCmd = conn.CreateCommand();
             deleteCmd.CommandText =
                 "DELETE FROM akya_order_items WHERE order_id = @orderId";
             deleteCmd.Parameters.AddWithValue("@orderId", orderId);
             deleteCmd.ExecuteNonQuery();
 
-            // ✅ yeniden ekle (kategori otomatik korunur)
             foreach (var item in items)
             {
                 using var insertCmd = conn.CreateCommand();
@@ -97,14 +93,11 @@ namespace Lavira.AkyaPOS.Repositories
             tran.Commit();
         }
 
-        // OrderRepository.cs dosyanın içine bu metodları ekle:
-
         public void MoveOrderToTable(int sourceTableId, int targetTableId)
         {
             using var conn = new SQLiteConnection(DatabaseInitializer.ConnectionString);
             conn.Open();
 
-            // Açık olan siparişi (is_closed = 0) bul ve table_id'sini değiştir
             using var cmd = new SQLiteCommand(@"
         UPDATE akya_orders 
         SET table_id = @targetId 
@@ -121,7 +114,6 @@ namespace Lavira.AkyaPOS.Repositories
             using var conn = new SQLiteConnection(DatabaseInitializer.ConnectionString);
             conn.Open();
 
-            // Açık olan siparişi bul ve durumunu 2 (Yönetici İptali/Kapatması) yap
             using var cmd = new SQLiteCommand(@"
         UPDATE akya_orders 
         SET is_closed = 2 
