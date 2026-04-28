@@ -58,7 +58,6 @@ namespace Lavira.AkyaPOS.Repositories
             cmd.ExecuteNonQuery();
         }
 
-        // 🔹 NORMAL KULLANICI EKLEME METHODU
         public static void CreateUser(string username, string password)
         {
             using var conn = new SQLiteConnection(DatabaseInitializer.ConnectionString);
@@ -66,7 +65,7 @@ namespace Lavira.AkyaPOS.Repositories
 
             var cmd = new SQLiteCommand(
                 @"INSERT INTO akya_users (username, password_hash, is_admin)
-                  VALUES (@u, @p, 0)", conn); // is_admin = 0 normal kullanıcı
+                  VALUES (@u, @p, 0)", conn);
 
             cmd.Parameters.AddWithValue("@u", username);
             cmd.Parameters.AddWithValue("@p", Core.Security.PasswordHasher.Hash(password));
@@ -78,7 +77,6 @@ namespace Lavira.AkyaPOS.Repositories
             using var conn = new System.Data.SQLite.SQLiteConnection(Lavira.AkyaPOS.Core.Database.DatabaseInitializer.ConnectionString);
             conn.Open();
 
-            // Sadece yönetici olan kullanıcıları çek
             var cmd = new System.Data.SQLite.SQLiteCommand(
                 "SELECT password_hash FROM akya_users WHERE is_admin = 1", conn);
 
@@ -87,7 +85,6 @@ namespace Lavira.AkyaPOS.Repositories
             {
                 string storedHash = reader.GetString(0);
 
-                // Senin PasswordHasher sınıfındaki yeni Verify metodu burada devreye giriyor
                 if (Core.Security.PasswordHasher.Verify(plainPassword, storedHash))
                 {
                     return true;
