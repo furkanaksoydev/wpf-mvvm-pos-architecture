@@ -42,7 +42,6 @@ namespace Lavira.AkyaPOS.Repositories
             return products;
         }
 
-        // ✅ EKLENEN METOT
         public List<Product> GetByCompany(int companyId)
         {
             var products = new List<Product>();
